@@ -15,8 +15,6 @@ int imgColumns;
 int channels;
 int const desiredChannels = 1;
 
-int* allocate1DArray(int rows, int columns);
-void deallocate1DArray(int* array, int rows, int columns);
 unsigned char* convolve(unsigned char*image, int* kx, int* ky);
 
 
