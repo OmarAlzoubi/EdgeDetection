@@ -1,1 +1,3 @@
 .vscode/
+assets/*
+edge_detection

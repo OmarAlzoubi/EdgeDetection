@@ -15,29 +15,31 @@ int imgColumns;
 int channels;
 int const desiredChannels = 1;
 
-int** allocate2DImage();
-void deallocate2DImage(int** array);
-int** convolve(int **image, int kx[kRows][kColumns], int ky[kRows][kColumns]);
-void map1Dto2D(unsigned char* image1D, int** image2D);
-void map2Dto1D(int** image2D, unsigned char* image1D);
+int* allocate1DArray(int rows, int columns);
+void deallocate1DArray(int* array, int rows, int columns);
+unsigned char* convolve(unsigned char*image, int* kx, int* ky);
 
-void edgeDetect(unsigned char* image1D, int** image2D,int kx[kRows][kColumns], int ky[kRows][kColumns]) {
 
-    image2D = convolve(image2D, kx, ky);
+unsigned char* edgeDetect(unsigned char* image1D, int* kx, int* ky) {
 
-    //Write the changes back to the image.
-    map2Dto1D(image2D, image1D);
-    deallocate2DImage(image2D);
-
+    unsigned char* edgeImage = convolve(image1D, kx, ky);
+    return edgeImage;
 }
 
 int main() {
     
     //Kernel
-    int kx[3][3] = {{1, 0, -1},{2, 0, -2},{1, 0, -1}};
-    int ky[3][3] = {{1, 2, 1},{0, 0, 0},{-1, -2, -1}};
+    int* kx = malloc(sizeof(int)*kRows*kColumns);
+    kx[0] = 1; kx[1] = 0; kx[2] = -1;
+    kx[3] = 2; kx[4] = 0; kx[5] = -2;
+    kx[6] = 1; kx[7] = 0; kx[8] = -1;
+    
+    int* ky = malloc(sizeof(int)*kRows*kColumns);
+    ky[0] = 1;  ky[1] = 2;   ky[2] = 1;
+    ky[3] = 0;  ky[4] = 0;   ky[5] = 0;
+    ky[6] = -1; ky[7] = -2; ky[8] = -1;
 
-    unsigned char *image1D = stbi_load("assets/3.png", &imgColumns, &imgRows, &channels, desiredChannels);
+    unsigned char* image1D = stbi_load("assets/4.png", &imgColumns, &imgRows, &channels, desiredChannels);
     if (image1D == NULL) {
         printf("Error while opening the image!\n");
         return 1;
@@ -45,95 +47,74 @@ int main() {
 
     printf("Image Info: imgColumns:%d, imgRows:%d, channels:%d\n", imgColumns, imgRows, channels);
 
-    int** image2D = allocate2DImage();
-    map1Dto2D(image1D, image2D);
-     
-    edgeDetect(image1D, image2D, kx, ky);
+    unsigned char* edgeImage= edgeDetect(image1D, kx, ky);
+    stbi_write_png("assets/edgeImage.png", imgColumns, imgRows, desiredChannels, edgeImage, imgColumns * desiredChannels);
 
-    stbi_write_png("assets/edgeImage.png", imgColumns, imgRows, desiredChannels, image1D, imgColumns * desiredChannels);
     stbi_image_free(image1D);
+    free(edgeImage);
+    free(kx);
+    free(ky);
 
     return 0;
 }
 
-int** allocate2DImage(){
 
-    int** array = malloc(sizeof(int*)*imgRows);
-    for (int i = 0; i < imgRows; i++){
-        array[i] = malloc(sizeof(int) * imgColumns);
-    }
+unsigned char* convolve(unsigned char*image, int* kx, int* ky) {
 
-    return array;
-}
+    unsigned char* edgeImage = malloc(sizeof(unsigned char)*imgRows*imgColumns);
 
-void deallocate2DImage(int** image2D) {
+    int kRowCenter = kRows/2;
+    int kColumnCenter = kColumns/2;
+    for (int i = 0; i < imgRows*imgColumns; i++) {
 
-    for (int i = 0; i < imgRows; i++){
-        free(image2D[i]);
-    }
+        int gx = 0;
+        int gy = 0;
 
-    free(image2D);    
-}
+        for (int ki = 0; ki < kRows; ki++) {
 
-void map1Dto2D(unsigned char* image1D, int** image2D){
+            //Center the kernel over pixel[i][j]
+            int currentRow = i/imgRows - kRowCenter + ki;
 
-    int outerIndex = 0;
-    for (int i = 0; i < imgRows; i++) {
-        for(int j = 0; j < imgColumns; j++){
-            image2D[i][j] = image1D[outerIndex];
-            outerIndex++;
-        }
-    }
-}
-
-void map2Dto1D(int** image2D, unsigned char* image1D){
-
-    int outerIndex = 0;
-    for (int i = 0; i < imgRows; i++) {
-        for (int j = 0; j < imgColumns; j++) {
-            image1D[outerIndex] = image2D[i][j];
-            outerIndex++;
-        }
-    }
-}
-
-int** convolve(int **image, int kx[kRows][kColumns], int ky[kRows][kColumns]) {
-
-    int **edgeImage = allocate2DImage();
-
-    for (int i = 0; i < imgRows; i++) {
-        for (int j = 0; j < imgColumns; j++){
-            int gx = 0;
-            int gy = 0;
-
-            for (int ki = 0; ki < kRows; ki++) {
-                for (int kj = 0; kj < kColumns; kj++){
-
-                    int syncI = i - (kRows/2) + ki;
-                    int syncJ = j - (kRows/2) + kj;
-
-                    //Padd with zero
-
-                    if ((syncI < 0) || (syncI > (imgRows-1))){
-                        continue;
-                    }
-
-                    if ((syncJ < 0) || (syncJ > (imgColumns-1))){
-                        continue;
-                    }
-
-                    gx = gx + image[syncI][syncJ] * kx[ki][kj];
-                    gy = gy + image[syncI][syncJ] * ky[ki][kj];
-                }
+            //No ovelap with kernel -> Pad with zero.
+            if ((currentRow < 0) || (currentRow > imgRows - 1)){
+                continue;
             }
 
-            int newPixel = sqrt(pow(gx, 2) + pow(gy, 2));            
-            edgeImage[i][j] = newPixel;
+            for (int kj = 0; kj < kColumns; kj++){
+
+                //Center the kernel over pixel[i][j]
+                int currentColumn = i%imgColumns - kColumnCenter + kj;
+
+                //No ovelap with kernel -> Pad with zero.
+                if ((currentColumn < 0) || (currentColumn > imgColumns -1)){
+                    continue;
+                }
+
+                //Therse if overlap.
+
+                int imageIDIndex = currentRow*imgColumns + currentColumn;
+                int kernelIDIndex = ki*kColumns + kj;
+
+                //printf("Here:%d\n", image[imageIDIndex]);
+                gx += image[imageIDIndex]*kx[kernelIDIndex];
+                gy += image[imageIDIndex]*ky[kernelIDIndex];
+                
+            }
         }
 
+        int newPixel = sqrt(pow(gx, 2) + pow(gy, 2));
 
+        if (newPixel < 0) {
+            newPixel = 0;
+        }else if (newPixel > 255) {
+            newPixel = 255;
+        }
+          
+        edgeImage[i] = newPixel;
+
+
+        
     }
 
-    deallocate2DImage(image);
     return edgeImage;
 }
