@@ -1,3 +1,4 @@
 .vscode/
 assets/*
+!assets/.gitkeep
 edge_detection
