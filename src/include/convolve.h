@@ -1,4 +1,5 @@
-#include "convolve.h"
+#pragma once
+
 #include <stdlib.h>
 #include <stdio.h>
 

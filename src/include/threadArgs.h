@@ -1,3 +1,4 @@
+#pragma  once
 typedef struct ThreadArgs {
     void (*taskFunction)(void* param);
     unsigned char* image;

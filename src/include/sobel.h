@@ -1,3 +1,4 @@
+#pragma once
 #include "convolve.h"
 #include "kernels.h"
 #include <stdlib.h>
@@ -11,7 +12,7 @@ unsigned char* combine (unsigned char* gx, unsigned char* gy, int imgRows, int i
 void sobel (void* param)
 {
     struct ThreadArgs *task = (struct ThreadArgs*)param;
-    
+
     unsigned char* image = task->image;
     unsigned char** partialConvolvedImage = task->partialConvolvedImage;
     int imgRows = task->imgRows;
@@ -21,7 +22,7 @@ void sobel (void* param)
     unsigned char* gx = convolve(image, imgRows, imgColumns, rowStart, rowEnd, sobelX[0], kRows, kColumns);
     unsigned char* gy = convolve(image, imgRows, imgColumns, rowStart, rowEnd, sobelY[0], kRows, kColumns);
 
-    *partialConvolvedImage = combine(gx, gy, rowEnd-rowStart, imgColumns);       
+    *partialConvolvedImage = combine(gx, gy, rowEnd-rowStart, imgColumns);
     free(gx);
     free(gy);
     free(task);
@@ -35,7 +36,7 @@ unsigned char* combine (unsigned char* gx, unsigned char* gy, int imgRows, int i
     {
 
         int finalValue = hypot(gx[i], gy[i]);
-        
+
         if (finalValue > 255)
         {
             finalValue = 255;

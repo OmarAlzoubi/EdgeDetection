@@ -1,1 +1,0 @@
-void sobel (void* param);

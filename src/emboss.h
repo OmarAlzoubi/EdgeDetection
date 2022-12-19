@@ -1,1 +1,0 @@
-// unsigned char* emboss (unsigned char* image, int imgRows, int imgColumns);
