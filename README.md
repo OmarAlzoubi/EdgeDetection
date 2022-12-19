@@ -3,7 +3,7 @@ Edge detection using C.
 ## Convolution Process:
 
 * In image processing, convolution is a mathematical operation that is used to modify the intensity values of pixels in an image. It involves multiplying 
-the intensity values of the pixels in the image by a set of coefficients, or "weights," and summing the results to produce a new intensity value for each pixel.
+the intensity values of the pixels in the image by a set of coefficients, or "weights", and summing the results to produce a new intensity value for each pixel.
 
 * Convolution is often used to apply various types of filters to an image, such as edge detection filters, blur filters, and sharpening filters. It is also used in
 image compression, image recognition, and other applications.
@@ -28,7 +28,7 @@ image compression, image recognition, and other applications.
       - This equation can be used to calculate the intensity value of each pixel in the output image by sliding the kernel over the input image, multiplying the                 overlapping pixels by the corresponding weights in the kernel, and summing the results.
 
 * We are using this image to demonstrate the convolution processing:
-  
+  ![This is an image](/assets/images/2D_Convolution_Animation.gif)
     
     
     
