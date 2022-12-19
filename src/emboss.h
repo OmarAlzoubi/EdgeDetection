@@ -1,1 +1,0 @@
-unsigned char* blur (unsigned char* image, int imgRows, int imgColumns, int* kernel, int kRows, int kColumns);
