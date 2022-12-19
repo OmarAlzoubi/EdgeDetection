@@ -4,7 +4,7 @@
 
 * There are several algorithms that can be used for edge detection, including the Sobel operator, Canny edge detector, and Prewitt operator. These algorithms work by     analyzing the intensity values of the pixels in the image and identifying sudden changes in intensity as edges.
 
-* Edge detection can be useful for a variety of applications, including image segmentation, object recognition, and image enhancement.
+* Edge detection can be useful for a variety of applications, including *image segmentation*, *object recognition*, and *image enhancement*.
 
 # Convolution Process
 
