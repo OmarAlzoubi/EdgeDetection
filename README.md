@@ -8,6 +8,11 @@
 
 * In this image, we show the effect of applied edge detection:
 
+      <p align="center">
+        <img src="/assets/images/edgeDetection.png" alt="edgedetection image">
+      </p>
+
+
 # Convolution Process
 
 * In image processing, convolution is a mathematical operation that is used to modify the intensity values of pixels in an image. It involves multiplying 
