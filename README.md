@@ -29,7 +29,7 @@ image compression, image recognition, and other applications.
 
 * We are using this image to demonstrate the convolution processing:
 
-  ![This is an image](/assets/images/2D_Convolution_Animation.gif)
+                          ![This is an image](/assets/images/2D_Convolution_Animation.gif)
     
     
     
