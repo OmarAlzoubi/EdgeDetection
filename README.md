@@ -1,6 +1,6 @@
 # EdgeDetection
 Edge detection using C.
-# Convolution Process:
+# Convolution Process
 
 * In image processing, convolution is a mathematical operation that is used to modify the intensity values of pixels in an image. It involves multiplying 
 the intensity values of the pixels in the image by a set of coefficients, or "weights", and summing the results to produce a new intensity value for each pixel.
