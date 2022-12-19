@@ -1,10 +1,12 @@
 #pragma  once
-typedef struct ThreadArgs {
 
-    unsigned char* image;
-    unsigned char** partialConvolvedImage;
+#include "image.h"
+
+struct ThreadArgs {
+
+    Image::Ptr image;
     int imgRows;
     int rowStart;
     int rowEnd;
     int imgColumns;
-} ThreadArgs;
+};

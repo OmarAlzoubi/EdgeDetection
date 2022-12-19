@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.23)
 project(edge_detection)
-set(CMAKE_C_STANDARD  17)
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+
+set(CMAKE_C_COMPILER  mpicc)
+set(CMAKE_CXX_COMPILER  mpicxx)
 
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
@@ -11,8 +15,8 @@ include_directories(src/include)
 
 add_executable(
         edge_detection
-        src/main.c
-        src/include/convolve.h
+        src/main.cpp
+        src/include/image.h
         src/include/kernels.h
         src/include/sobel.h
         src/include/stb_image.h
