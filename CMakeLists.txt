@@ -11,7 +11,7 @@ include_directories(src/include)
 
 add_executable(
         edge_detection
-        src/parallel.c
+        src/main.c
         src/include/convolve.h
         src/include/kernels.h
         src/include/sobel.h
