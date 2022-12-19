@@ -7,9 +7,8 @@
 * Edge detection can be useful for a variety of applications, including *image segmentation*, *object recognition*, and *image enhancement*.
 
 * In this image, we show the effect of applied edge detection:
-
       <p align="center">
-        <img src="/assets/images/edgeDetection.png" alt="edgedetection image">
+            <img src="/assets/images/edgeDetection.png" alt="edgeDetection image">
       </p>
 
 
