@@ -26,6 +26,9 @@ image compression, image recognition, and other applications.
       - Kernel[x - i, y - j] is the weight of the kernel at position (x - i, y - j) relative to the center of the kernel.
       - The sum is taken over all x and y within the bounds of the kernel.
       - This equation can be used to calculate the intensity value of each pixel in the output image by sliding the kernel over the input image, multiplying the                 overlapping pixels by the corresponding weights in the kernel, and summing the results.
+
+* We are using this image to demonstrate the convolution processing:
+  
     
     
     
