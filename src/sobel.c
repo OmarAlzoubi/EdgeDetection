@@ -4,39 +4,44 @@
 #include <pthread.h>
 #include <math.h>
 #include <stdio.h>
-#include "task.h"
+#include "threadArgs.h"
 
-unsigned char combine (unsigned char gx, unsigned char gy);
+unsigned char* combine (unsigned char* gx, unsigned char* gy, int imgRows, int imgColumns);
 
 void sobel (void* param)
 {
-    struct Task *task = (struct Task*)param;
+    struct ThreadArgs *task = (struct ThreadArgs*)param;
     
     unsigned char* image = task->image;
-    unsigned char* partialConvolvedImage = task->partialConvolvedImage;
+    unsigned char** partialConvolvedImage = task->partialConvolvedImage;
     int imgRows = task->imgRows;
     int rowStart = task->rowStart;
+    int rowEnd = task->rowEnd;
     int imgColumns = task->imgColumns;
-    int i = task->i;
-    int j = task->j;
+    unsigned char* gx = convolve(image, imgRows, imgColumns, rowStart, rowEnd, sobelX[0], kRows, kColumns);
+    unsigned char* gy = convolve(image, imgRows, imgColumns, rowStart, rowEnd, sobelY[0], kRows, kColumns);
 
-    unsigned char pixel = image[i*imgColumns+j];
-    unsigned char gx = convolve(image, imgRows, imgColumns, pixel, i, j, sobelX[0], kRows, kColumns);
-    unsigned char gy = convolve(image, imgRows, imgColumns, pixel, i, j, sobelY[0], kRows, kColumns);
-
-    partialConvolvedImage[(i-rowStart)*imgColumns + j] = combine(gx, gy);
-
+    *partialConvolvedImage = combine(gx, gy, rowEnd-rowStart, imgColumns);       
+    free(gx);
+    free(gy);
     free(task);
+
 }
 
-unsigned char combine (unsigned char gx, unsigned char gy)
+unsigned char* combine (unsigned char* gx, unsigned char* gy, int imgRows, int imgColumns)
 {
-    int finalValue = hypot(gx, gy);
-    
-    if (finalValue > 255)
+    unsigned char* image = malloc(sizeof(unsigned char) * imgRows * imgColumns);
+    for (int i = 0; i < imgRows * imgColumns; i++)
     {
-        finalValue = 255;
-    }
 
-    return finalValue;
+        int finalValue = hypot(gx[i], gy[i]);
+        
+        if (finalValue > 255)
+        {
+            finalValue = 255;
+        }
+
+        image[i] = finalValue;
+    }
+    return image;
 }

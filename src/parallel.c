@@ -3,9 +3,8 @@
 #include <mpi.h>
 #include <pthread.h>
 
-#include "../libs/C-Thread-Pool/thpool.h"
 #include "sobel.h"
-#include "task.h"
+#include "threadArgs.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../libs/stb/stb_image.h"
@@ -87,37 +86,24 @@ int main(int argc, char** argv) {
         }
     }
 
-    partialConvolvedImage = (unsigned char*)malloc(sizeof(unsigned char) * (rowEnd-rowStart)*imgColumns);
+    ThreadArgs* args = (ThreadArgs*)malloc(sizeof(ThreadArgs));
 
-    threadpool thpool = thpool_init(1);
 
-    for (int i = rowStart; i < rowEnd; i++)
-    {
+    args->image = image1D;
+    args->partialConvolvedImage = &partialConvolvedImage;
+    args->imgRows = imgRows;
+    args->rowStart = rowStart;
+    args->rowEnd = rowEnd;
+    args->imgColumns = imgColumns;
 
-        for (int j = 0; j < imgColumns; j++)
-        {
-            Task* t = malloc(sizeof(Task));
+    pthread_t myThread;
 
-            t->taskFunction = &sobel;
-            t->image = image1D;
-            t->partialConvolvedImage = partialConvolvedImage;
-            t->imgRows = imgRows;
-            t->imgColumns = imgColumns;
-            t->i = i;
-            t->j = j;
-            t->rowStart = rowStart;
-
-            thpool_add_work(thpool, (void*)sobel, (void*)t);
-        
-        }
-    }
-
-    thpool_wait(thpool);
-    thpool_destroy(thpool);
+    pthread_create(&myThread, NULL, (void*)sobel, (void*)args);
+    pthread_join(myThread, NULL);
 
     //Maybe use typdef to shorten the syntax
     MPI_Gatherv(partialConvolvedImage, (rowEnd-rowStart)*imgColumns, MPI_UNSIGNED_CHAR, convolvedImage, recivedCount, displs, MPI_UNSIGNED_CHAR, MASTER, MPI_COMM_WORLD);
-
+    
     if (myRank == MASTER)
     {
         stbi_write_png("assets/OUT.png", imgColumns, imgRows, desiredChannels, convolvedImage, imgColumns * desiredChannels);        

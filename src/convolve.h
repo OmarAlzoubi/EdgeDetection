@@ -1,1 +1,1 @@
-unsigned char convolve(unsigned char*image, int imgRows, int imgColumns, unsigned char pixel, int row, int column, int* kernel,int kRows, int kColumns);
+unsigned char* convolve(unsigned char*image, int imgRows, int imgColumns, int rowStart, int rowEnd, int* kernel,int kRows, int kColumns);

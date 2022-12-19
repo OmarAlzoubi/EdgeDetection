@@ -1,11 +1,10 @@
-typedef struct Task {
+typedef struct ThreadArgs {
     void (*taskFunction)(void* param);
     unsigned char* image;
-    unsigned char* partialConvolvedImage;
+    unsigned char** partialConvolvedImage;
     int imgRows;
     int rowStart;
+    int rowEnd;
     int imgColumns;
-    int i;
-    int j;
 
-} Task;
+} ThreadArgs;
