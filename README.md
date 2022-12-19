@@ -6,6 +6,8 @@
 
 * Edge detection can be useful for a variety of applications, including *image segmentation*, *object recognition*, and *image enhancement*.
 
+* In this image, we show the effect of applied edge detection:
+
 # Convolution Process
 
 * In image processing, convolution is a mathematical operation that is used to modify the intensity values of pixels in an image. It involves multiplying 
