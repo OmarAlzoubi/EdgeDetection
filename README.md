@@ -1,5 +1,11 @@
-# EdgeDetection
-Edge detection using C.
+# Edge Detection
+
+* Edge detction  is a common image processing technique that is used to identify the edges in an image. An edge is a boundary between two distinct regions in an image.   It is often used to highlight features in an image or to separate objects from their background.
+
+* There are several algorithms that can be used for edge detection, including the Sobel operator, Canny edge detector, and Prewitt operator. These algorithms work by     analyzing the intensity values of the pixels in the image and identifying sudden changes in intensity as edges.
+
+* Edge detection can be useful for a variety of applications, including image segmentation, object recognition, and image enhancement.
+
 # Convolution Process
 
 * In image processing, convolution is a mathematical operation that is used to modify the intensity values of pixels in an image. It involves multiplying 
