@@ -4,9 +4,7 @@
 
 struct ThreadArgs {
 
-    Image::Ptr image;
-    int imgRows;
+    h2o::Image::Ptr image;
     int rowStart;
     int rowEnd;
-    int imgColumns;
 };

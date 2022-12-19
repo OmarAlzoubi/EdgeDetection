@@ -3,4 +3,5 @@ assets/*
 !assets/.gitkeep
 edge_detection
 .idea/
-cmake-build-debug
+cmake-build-debug/
+cmake-build-release/

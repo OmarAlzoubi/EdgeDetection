@@ -17,10 +17,9 @@ add_executable(
         edge_detection
         src/main.cpp
         src/include/image.h
-        src/include/kernels.h
         src/include/sobel.h
         src/include/stb_image.h
         src/include/stb_image_write.h
         src/include/threadArgs.h
-)
+        src/include/mpi_handler.h)
 target_link_libraries(edge_detection ${MPI_C_LIBRARIES})

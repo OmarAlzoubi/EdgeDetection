@@ -1,70 +1,72 @@
-#include <mpi.h>
 #include <thread>
 
+#include "stb_image_write.h"
+
+#include "image.h"
 #include "sobel.h"
 #include "threadArgs.h"
-
-#include "stb_image_write.h"
-#include "image.h"
-
+#include "mpi_handler.h"
 
 int main(int argc, char *argv[]) {
 
-    int myRank, numOfProcs;
-    MPI_Init(&argc, &argv);
-    MPI_Comm_size(MPI_COMM_WORLD, &numOfProcs);
-    MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+    h2o::MPIHandler handler(argc, argv);
 
-    Image::Ptr image1D;
-    Image::Ptr convolvedImage;
+    h2o::Image::Ptr image1D;
+    h2o::Image::Ptr convolvedImage;
 
-    int MASTER = numOfProcs - 1;
+    int MASTER = handler.numOfProcs - 1;
 
-    int imgColumns, imgRows;
+    int imgColumns{}, imgRows{};
     int desiredChannels = 1;
 
     //For MPI_Gatherv.
-    std::vector<int> displs(numOfProcs), recivedCount(numOfProcs);
+    std::vector<int> displs(handler.numOfProcs), recivedCount(handler.numOfProcs);
 
     //Read image by master proc.
-    if (myRank == MASTER) {
+    if (handler.rank == MASTER) {
 
-        image1D = Image::from_file("assets/9.jpg");
+        image1D = h2o::Image::from_file("assets/9.jpg");
+
         imgColumns = image1D->columns();
         imgRows = image1D->rows();
 
         printf("Image Info: imgColumns:%d, imgRows:%d\n", imgColumns, imgRows);
-
-        //Allocate array for output image.
-        convolvedImage = Image::empty(imgRows, imgColumns);
     }
 
     MPI_Bcast(&imgRows, 1, MPI_INT, MASTER, MPI_COMM_WORLD);
     MPI_Bcast(&imgColumns, 1, MPI_INT, MASTER, MPI_COMM_WORLD);
+    convolvedImage = h2o::Image::empty(imgRows, imgColumns);
 
-    if (myRank != MASTER) {
-        image1D = Image::empty(imgRows, imgColumns);
+    if (handler.rank != MASTER) {
+        image1D = h2o::Image::empty(imgRows, imgColumns);
     }
-    MPI_Bcast(image1D->mut_data(), imgRows * imgColumns, MPI_UNSIGNED_CHAR, MASTER, MPI_COMM_WORLD);
 
-    int offset = imgRows / numOfProcs;
-    int rowStart = myRank * offset;
+    MPI_Bcast(
+            image1D->mut_data(),
+            imgRows * imgColumns,
+            MPI_UNSIGNED_CHAR,
+            MASTER,
+            MPI_COMM_WORLD
+    );
+
+    int offset = imgRows / handler.numOfProcs;
+    int rowStart = handler.rank * offset;
     int rowEnd = rowStart + offset;
 
     //Add extra rows to the master portion
-    if (myRank == MASTER) {
+    if (handler.rank == MASTER) {
 
-        rowEnd = rowEnd + imgRows % numOfProcs;
+        rowEnd = rowEnd + imgRows % handler.numOfProcs;
     }
 
     //For MPI_Gatherv.
-    if (myRank == MASTER) {
+    if (handler.rank == MASTER) {
 
-        for (int i = 0; i < numOfProcs; i++) {
+        for (int i = 0; i < handler.numOfProcs; i++) {
             if (i == MASTER) {
                 recivedCount[i] = (rowEnd - rowStart) * imgColumns;
             } else {
-                recivedCount[i] = (rowEnd - (imgRows % numOfProcs) - rowStart) * imgColumns;
+                recivedCount[i] = (rowEnd - (imgRows % handler.numOfProcs) - rowStart) * imgColumns;
             }
 
             displs[i] = (i == 0) ? 0 : displs[i - 1] + recivedCount[i - 1];
@@ -73,21 +75,23 @@ int main(int argc, char *argv[]) {
 
     auto args = ThreadArgs{
             .image = image1D,
-            .imgRows = imgRows,
             .rowStart = rowStart,
             .rowEnd = rowEnd,
-            .imgColumns = imgColumns
     };
 
-    auto convolvedImagePartPromise = std::promise<Image::Ptr>{};
+    auto convolvedImagePartPromise = std::promise<h2o::Image::Ptr>{};
     auto convolvedImagePartFuture = convolvedImagePartPromise.get_future();
 
-    std::jthread thread{sobel, args, std::move(convolvedImagePartPromise)};
+    std::jthread thread{
+            h2o::sobel,
+            args,
+            std::move(convolvedImagePartPromise)
+    };
+    convolvedImagePartFuture.wait();
     auto convolvedImagePart = convolvedImagePartFuture.get();
 
-    //Maybe use typdef to shorten the syntax
     MPI_Gatherv(
-            convolvedImagePart->mut_data(),
+            convolvedImagePart->span().data(),
             (rowEnd - rowStart) * imgColumns,
             MPI_UNSIGNED_CHAR,
             convolvedImage->mut_data(),
@@ -98,7 +102,7 @@ int main(int argc, char *argv[]) {
             MPI_COMM_WORLD
     );
 
-    if (myRank == MASTER) {
+    if (handler.rank == MASTER) {
         stbi_write_png(
                 "assets/OUT.png",
                 imgColumns,
@@ -108,8 +112,5 @@ int main(int argc, char *argv[]) {
                 imgColumns * desiredChannels
         );
     }
-
-    MPI_Finalize();
-    return 0;
 }
 
