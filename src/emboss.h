@@ -1,1 +1,1 @@
-unsigned char* blur (unsigned char* image, int imgRows, int imgColumns, int* kernel, int kRows, int kColumns);
+// unsigned char* emboss (unsigned char* image, int imgRows, int imgColumns);

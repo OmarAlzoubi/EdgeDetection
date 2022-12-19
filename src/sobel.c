@@ -1,38 +1,42 @@
 #include "convolve.h"
 #include "kernels.h"
 #include <stdlib.h>
+#include <pthread.h>
 #include <math.h>
+#include <stdio.h>
+#include "task.h"
 
+unsigned char combine (unsigned char gx, unsigned char gy);
 
-unsigned char* combine (unsigned char* gx, unsigned char* gy, int imgRows, int imgColumns);
-
-unsigned char* sobel (unsigned char* image, int imgRows, int imgColumns)
+void sobel (void* param)
 {
-    unsigned char* gx = convolve(image, imgRows, imgColumns, sobelX[0], kRows, kColumns);
-    unsigned char* gy = convolve(image, imgRows, imgColumns, sobelY[0], kRows, kColumns);
-    unsigned char* edgeImage = combine(gx, gy, imgRows, imgColumns);
+    struct Task *task = (struct Task*)param;
+    
+    unsigned char* image = task->image;
+    unsigned char* partialConvolvedImage = task->partialConvolvedImage;
+    int imgRows = task->imgRows;
+    int rowStart = task->rowStart;
+    int imgColumns = task->imgColumns;
+    int i = task->i;
+    int j = task->j;
 
-    free (gx);
-    free (gy);
+    unsigned char pixel = image[i*imgColumns+j];
+    unsigned char gx = convolve(image, imgRows, imgColumns, pixel, i, j, sobelX[0], kRows, kColumns);
+    unsigned char gy = convolve(image, imgRows, imgColumns, pixel, i, j, sobelY[0], kRows, kColumns);
 
-    return edgeImage;
+    partialConvolvedImage[(i-rowStart)*imgColumns + j] = combine(gx, gy);
+
+    free(task);
 }
 
-unsigned char* combine (unsigned char* gx, unsigned char* gy, int imgRows, int imgColumns)
+unsigned char combine (unsigned char gx, unsigned char gy)
 {
-    unsigned char* image = malloc(sizeof(unsigned char) * imgRows * imgColumns);
-
-    for (int i = 0; i < imgRows * imgColumns; i++)
+    int finalValue = hypot(gx, gy);
+    
+    if (finalValue > 255)
     {
-        int finalValue = hypot(gx[i], gy[i]);
-        
-        if (finalValue > 255)
-        {
-            finalValue = 255;
-        }
-
-        image[i] = finalValue;
+        finalValue = 255;
     }
 
-    return image;
+    return finalValue;
 }
