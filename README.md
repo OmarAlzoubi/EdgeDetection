@@ -19,6 +19,7 @@ image compression, image recognition, and other applications.
   * We can represent the above steps mathematically with the following equation:
   
     **Output[i, j] = sum(Input[x, y] * Kernel[x - i, y - j])**
+    
     Where:
       - Output[i, j] is the intensity value of the pixel at position (i, j) in the output image.
       - Input[x, y] is the intensity value of the pixel at position (x, y) in the input image.
