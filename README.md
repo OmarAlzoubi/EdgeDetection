@@ -30,6 +30,8 @@
 
 * By convolving the image with both of these kernels, we can detect edges in both the horizontal and vertical directions.
 
+* The gradient images produced by convolving the image with the Sobel kernels Px and Py represent the approximate horizontal and vertical derivatives of the image, respectively. The magnitude of the gradient at each pixel is then computed as the square root of the sum of the squares of these gradient images `square root of ((Px)^2+(Py)^2)`. This gives a measure of the strength of the edge at each pixel.
+
 # Convolution Process
 
 * In image processing, convolution is a mathematical operation that is used to modify the intensity values of pixels in an image. It involves multiplying 
