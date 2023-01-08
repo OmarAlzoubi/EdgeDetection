@@ -41,10 +41,7 @@ image compression, image recognition, and other applications.
 
 * We are using this image to demonstrate the convolution processing:
               
-     <p align="center">
-        <img src="/assets/images/2D_Convolution_Animation.gif" alt="convolution image">
-     </p>
-     
+
      <p align="center">
         <img src="/assets/images/convolution.gif" alt="convolution image">
      </p>
