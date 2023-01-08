@@ -13,18 +13,18 @@
 
 # Soble Filter
 * The Sobel operator convolves the image with two 3x3 kernels, one for horizontal changes and one for vertical changes, to approximate the derivatives in each direction.
-'''
-[-1  0  1]
-[-2  0  2]
-[-1  0  1]
-'''
+   ```sh
+      [-1  0  1]
+      [-2  0  2]
+      [-1  0  1]
+   ```
 
 * This kernel is designed to highlight horizontal changes in the image. When this kernel is convolved with the image, it will give a large output for pixels where the values of the neighboring pixels in the x direction differ significantly. This will result in strong responses at the locations of horizontal edges in the image.
-'''
-[-1 -2 -1]
-[ 0  0  0]
-[ 1  2  1]
-'''
+   ```sh
+      [-1 -2 -1]
+      [ 0  0  0]
+      [ 1  2  1]
+   ```
 
 * This kernel is designed to highlight vertical changes in the image. When this kernel is convolved with the image, it will give a large output for pixels where the values of the neighboring pixels in the y direction differ significantly. This will result in strong responses at the locations of vertical edges in the image.
 
